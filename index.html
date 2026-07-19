@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Totally Human — The Party Game of Decoding Humans</title>
+<style>
+  :root{
+    --ink:#2A2153;          /* deep space violet — text & dark sections */
+    --paper:#F2F5FB;        /* pale daylight-sky background */
+    --card:#FFFFFF;
+    --cta:#FFC63F;          /* sunny yellow — buttons */
+    --teal:#1FB8A3;         /* alien signal teal */
+    --coral:#FF6A5A;        /* stamp / highlight pop */
+    --mono:'Courier New', Courier, monospace;
+    --body:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --display:'Trebuchet MS', 'Segoe UI', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:var(--body);color:var(--ink);background:var(--paper);line-height:1.55;}
+  h1,h2,h3{font-family:var(--display);line-height:1.12;letter-spacing:-0.01em;}
+  section{padding:72px 24px;}
+  .wrap{max-width:1040px;margin:0 auto;}
+  .btn{display:inline-block;background:var(--cta);color:var(--ink);font-weight:800;font-size:1.05rem;
+       padding:16px 34px;border-radius:999px;text-decoration:none;border:3px solid var(--ink);
+       box-shadow:4px 4px 0 var(--ink);transition:transform .12s ease, box-shadow .12s ease;}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);}
+  .btn:focus-visible{outline:3px dashed var(--teal);outline-offset:4px;}
+  .mono{font-family:var(--mono);}
+  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:.8rem;
+           color:var(--teal);font-weight:700;margin-bottom:14px;}
+
+  /* ---------- TRANSMISSION BAR ---------- */
+  .ticker{background:var(--ink);color:#CFE9E4;font-family:var(--mono);font-size:.8rem;
+          letter-spacing:.08em;padding:9px 16px;text-align:center;text-transform:uppercase;
+          position:sticky;top:0;z-index:50;}
+  .ticker b{color:var(--cta);}
+  .tickbtn{display:inline-block;background:var(--cta);color:var(--ink);font-weight:800;
+           font-size:.74rem;padding:5px 14px;border-radius:999px;text-decoration:none;
+           margin-left:12px;letter-spacing:.04em;}
+
+  /* ---------- UGC GALLERY ---------- */
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:40px;}
+  .shot{background:var(--paper);border:2px solid #DFE3F0;border-radius:12px;aspect-ratio:4/5;
+        display:flex;align-items:flex-end;padding:14px;transform:rotate(-1deg);}
+  .shot:nth-child(2n){transform:rotate(1.2deg);}
+  .shot span{font-family:var(--mono);font-size:.74rem;color:#6B6590;line-height:1.4;}
+
+  /* ---------- PODCAST SECTION ---------- */
+  .podcast{background:var(--ink);color:#EDEBFA;
+       background-image:radial-gradient(#4A3F86 1.2px, transparent 1.2px);background-size:34px 34px;}
+  .podcast h2{color:#fff;font-size:clamp(1.7rem,3.2vw,2.4rem);margin-bottom:16px;}
+  .podcast .wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:44px;align-items:center;}
+  .podcast p{margin-bottom:14px;font-size:1.02rem;}
+  .priceline{font-family:var(--mono);font-size:.88rem;color:var(--cta);margin:18px 0 6px;}
+  .standalone{font-size:.9rem;color:#B7B1DE;font-style:italic;}
+  .agechip{display:inline-block;font-family:var(--mono);font-size:.74rem;font-weight:700;
+           letter-spacing:.1em;color:var(--ink);background:var(--cta);border-radius:999px;
+           padding:5px 14px;margin-bottom:16px;}
+  .podcover{aspect-ratio:1/1;border:3px dashed rgba(255,255,255,.5);border-radius:20px;
+            display:flex;align-items:center;justify-content:center;position:relative;
+            font-family:var(--mono);font-size:.85rem;color:#B7B1DE;text-align:center;
+            background:rgba(255,255,255,.05);margin-bottom:14px;}
+  .playbadge{position:absolute;bottom:-16px;right:-16px;width:56px;height:56px;border-radius:50%;
+             background:var(--cta);color:var(--ink);display:flex;align-items:center;justify-content:center;
+             font-size:1.3rem;border:3px solid var(--ink);}
+  .ep{background:rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;
+      font-family:var(--mono);font-size:.78rem;color:#CFC9F2;}
+  .ep .eptitle{color:#fff;font-weight:700;}
+
+  /* ---------- HERO ---------- */
+  .hero{background:var(--paper);padding-top:64px;position:relative;overflow:hidden;}
+  .hero .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;}
+  .hero h1{font-size:clamp(2.1rem,4.6vw,3.4rem);margin-bottom:20px;}
+  .hero h1 .quiet{color:var(--teal);}
+  .hero p.sub{font-size:1.22rem;margin-bottom:26px;max-width:34ch;}
+  .microline{font-family:var(--mono);font-size:.82rem;margin-top:16px;color:#5A5480;
+             text-transform:uppercase;letter-spacing:.08em;}
+  /* CSS-drawn box mock (placeholder for product shot) */
+  .boxmock{background:var(--ink);border-radius:18px;padding:34px 26px;color:#fff;text-align:center;
+           transform:rotate(3deg);border:3px solid var(--ink);
+           box-shadow:10px 10px 0 rgba(42,33,83,.18);position:relative;}
+  .boxmock .stars{font-size:1.3rem;letter-spacing:.4em;color:var(--cta);}
+  .boxmock h3{font-size:2rem;margin:10px 0 4px;color:#fff;}
+  .boxmock .tag{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#B9F0E7;}
+  .boxmock .hook{margin-top:22px;background:var(--coral);color:#fff;font-weight:800;
+                 padding:10px;border-radius:10px;font-size:.95rem;transform:rotate(-2deg);}
+  .photonote{font-family:var(--mono);font-size:.72rem;color:#8A85A8;margin-top:12px;text-align:center;}
+  .heroSketch{width:100%;height:auto;display:block;}
+  .microline s{color:#8A85A8;}
+
+  /* ---------- TRUST STRIP ---------- */
+  .trustbar{background:#fff;border-top:2px solid #E4E8F2;border-bottom:2px solid #E4E8F2;
+            text-align:center;padding:14px 20px;font-size:.95rem;color:#4A4470;}
+  .trustbar b{color:var(--ink);}
+
+  /* ---------- FIELD NOTE CARDS ---------- */
+  .metoo{background:#fff;}
+  .metoo h2{font-size:clamp(1.7rem,3.4vw,2.5rem);margin-bottom:14px;}
+  .metoo .lede{max-width:56ch;margin-bottom:20px;font-size:1.08rem;}
+  .kidmade{display:inline-block;background:var(--cta);border:3px solid var(--ink);border-radius:10px;
+           padding:8px 16px;font-weight:700;font-size:.92rem;transform:rotate(-1.5deg);
+           box-shadow:3px 3px 0 var(--ink);margin-bottom:38px;}
+  /* ---------- FIELD NOTE + RESPONSE PAIRS (4:5 portrait cards) ---------- */
+  .pairrow{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;margin-bottom:44px;}
+  .pair{position:relative;padding-bottom:64px;}
+  .fieldnote{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:22px 20px;
+             box-shadow:5px 5px 0 var(--ink);transform:rotate(-1.5deg);
+             aspect-ratio:4/5;display:flex;flex-direction:column;}
+  .pair:nth-child(2) .fieldnote{transform:rotate(1.2deg);}
+  .fieldnote .stamp{font-family:var(--mono);font-size:.72rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:.1em;color:#fff;background:var(--coral);display:inline-block;
+                    padding:3px 10px;border-radius:6px;margin-bottom:14px;transform:rotate(-2deg);
+                    align-self:flex-start;}
+  .fieldnote p{font-size:1.02rem;font-weight:600;}
+  /* response card slapped on top, bottom-right — like the winning play */
+  .rcard{position:absolute;bottom:0;right:-6px;width:64%;aspect-ratio:4/5;max-height:180px;
+         background:var(--ink);color:#fff;font-family:var(--mono);font-size:.86rem;
+         padding:16px 14px;border-radius:12px;border:3px solid var(--ink);
+         box-shadow:0 8px 18px rgba(42,33,83,.28);transform:rotate(5deg);
+         display:flex;flex-direction:column;justify-content:center;}
+  .pair:nth-child(2) .rcard{transform:rotate(-4deg);background:var(--teal);}
+  .winbadge{position:absolute;top:-15px;left:-16px;background:var(--cta);color:var(--ink);
+            border:3px solid var(--ink);border-radius:999px;font-family:var(--mono);
+            font-size:.62rem;font-weight:700;letter-spacing:.08em;padding:6px 11px;
+            transform:rotate(-9deg);white-space:nowrap;}
+  .metoo .closer{text-align:center;font-size:1.1rem;font-weight:700;}
+
+  /* ---------- HOW IT WORKS (dark, alien voice) ---------- */
+  .how{background:var(--ink);color:#EDEBFA;
+       background-image:radial-gradient(#4A3F86 1.2px, transparent 1.2px);background-size:34px 34px;}
+  .how h2{color:#fff;font-size:clamp(1.7rem,3.2vw,2.4rem);margin-bottom:44px;}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+  .step{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.25);border-radius:16px;padding:26px;}
+  .step .num{font-family:var(--mono);color:var(--cta);font-weight:700;letter-spacing:.12em;
+             text-transform:uppercase;font-size:.8rem;margin-bottom:10px;}
+  .stepart{margin-bottom:6px;}
+  .stepart svg{width:100%;max-height:76px;display:block;}
+
+  /* ---------- FULL-BLEED PHOTO BAND ---------- */
+  .photoband{min-height:340px;background:#DAD5EF;border-top:3px solid var(--ink);
+             border-bottom:3px solid var(--ink);display:flex;flex-direction:column;
+             align-items:center;justify-content:center;gap:22px;padding:40px 20px;text-align:center;}
+  .bandnote{font-family:var(--mono);font-size:.78rem;color:#6B6590;line-height:1.6;}
+  .bandquote{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,3.4vw,2.3rem);
+             color:var(--ink);background:#fff;padding:10px 26px;border-radius:12px;
+             border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);transform:rotate(-1deg);}
+
+  .bicon{font-size:1.15rem;margin-right:9px;}
+  .step h3{color:#fff;font-size:1.25rem;margin-bottom:10px;}
+  .step p{font-family:var(--mono);font-size:.92rem;color:#CFC9F2;}
+  .modes{margin-top:38px;background:rgba(255,255,255,.08);border:2px dashed rgba(255,255,255,.4);
+         border-radius:14px;padding:20px 24px;font-size:.98rem;}
+  .modes b{color:var(--cta);}
+
+  /* ---------- SECRET BENEFITS ---------- */
+  .secret{background:var(--paper);}
+  .secret h2{font-size:clamp(1.7rem,3.2vw,2.4rem);margin-bottom:40px;}
+  .bgrid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:50px;}
+  .benefit{background:#fff;border-radius:16px;padding:26px;border:2px solid #DFE3F0;}
+  .benefit h3{font-size:1.15rem;margin-bottom:8px;}
+  .anthem{text-align:center;font-family:var(--display);font-size:clamp(1.35rem,2.8vw,1.9rem);
+          font-weight:800;max-width:24ch;margin:0 auto 14px;}
+  .anthem span{color:var(--teal);}
+  .aicoda{text-align:center;max-width:52ch;margin:0 auto 34px;font-size:1.02rem;color:#4A4470;}
+
+  /* ---------- STATEMENT SECTION ---------- */
+  .statement{background:#fff;text-align:center;padding:88px 24px;}
+  .statement .anthem{font-size:clamp(1.6rem,3.6vw,2.6rem);max-width:26ch;margin-bottom:22px;}
+  .statement .aicoda{margin-bottom:0;font-size:1.08rem;}
+  .center{text-align:center;}
+
+  /* ---------- SOCIAL PROOF ---------- */
+  .proof{background:#fff;}
+  .proof h2{font-size:clamp(1.7rem,3.2vw,2.4rem);margin-bottom:38px;}
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:30px;}
+  .quote{background:var(--paper);border-radius:16px;padding:24px;border:2px solid #DFE3F0;font-size:.98rem;}
+  .quote .who{font-family:var(--mono);font-size:.78rem;margin-top:14px;color:#6B6590;text-transform:uppercase;letter-spacing:.08em;}
+  .badges{font-family:var(--mono);font-size:.82rem;text-align:center;color:#5A5480;letter-spacing:.04em;}
+
+  /* ---------- GIFT ---------- */
+  .gift{background:var(--teal);color:var(--ink);}
+  .gift h2{font-size:clamp(1.7rem,3.2vw,2.4rem);margin-bottom:16px;}
+  .gift p{max-width:62ch;font-size:1.08rem;margin-bottom:18px;}
+  .splitgrid{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
+  .panel{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:30px 28px;
+         box-shadow:6px 6px 0 var(--ink);display:flex;flex-direction:column;gap:16px;
+         align-items:flex-start;}
+  .panel h2{font-size:clamp(1.3rem,2.4vw,1.7rem) !important;margin-bottom:0 !important;}
+  .panel p{margin-bottom:0;font-size:1rem;}
+  .panel .eyebrow{margin-bottom:0;}
+  .gshot{aspect-ratio:4/3;background:var(--paper);border:2px dashed #9A93C4;border-radius:12px;
+         display:flex;align-items:flex-end;padding:14px;width:100%;}
+  .gshot span{font-family:var(--mono);font-size:.74rem;color:#6B6590;line-height:1.4;}
+
+  /* ---------- FAQ ---------- */
+  .faq{background:var(--paper);}
+  .faq h2{font-size:clamp(1.7rem,3.2vw,2.4rem);margin-bottom:30px;}
+  details{background:#fff;border:2px solid #DFE3F0;border-radius:12px;padding:18px 22px;margin-bottom:12px;}
+  details[open]{border-color:var(--ink);}
+  summary{font-weight:800;cursor:pointer;font-size:1.02rem;}
+  details p{margin-top:10px;font-size:.98rem;}
+
+  /* ---------- FINAL CTA ---------- */
+  .final{background:var(--ink);color:#EDEBFA;text-align:center;
+         background-image:radial-gradient(#4A3F86 1.2px, transparent 1.2px);background-size:34px 34px;}
+  .final h2{color:#fff;font-size:clamp(1.8rem,3.6vw,2.7rem);max-width:22ch;margin:0 auto 18px;}
+  .final p{max-width:52ch;margin:0 auto 30px;font-size:1.08rem;}
+  .final .fineprint{font-family:var(--mono);font-size:.78rem;margin-top:18px;color:#B7B1DE;}
+  .offercard{background:rgba(255,255,255,.08);border:2px dashed var(--cta);border-radius:16px;
+             padding:22px 26px;max-width:560px;margin:0 auto 28px;text-align:left;font-size:.98rem;}
+  .offercard .offertitle{font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;
+             color:var(--cta);font-weight:700;font-size:.82rem;margin-bottom:8px;}
+  .offercard b{color:var(--cta);}
+
+  @media (max-width:820px){
+    .hero .wrap,.bgrid,.podcast .wrap{grid-template-columns:1fr;}
+    .steps,.quotes{grid-template-columns:1fr;}
+    .gallery{grid-template-columns:repeat(2,1fr);}
+    .splitgrid{grid-template-columns:1fr;}
+    .ticker{font-size:.68rem;}
+    /* card pairs become a thumb-swipe row — like fanning a hand of cards */
+    .pairrow{display:flex;overflow-x:auto;gap:22px;padding:4px 4px 12px;
+             scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
+    .pair{flex:0 0 76%;scroll-snap-align:center;}
+    section{padding:52px 18px;}
+  }
+  @media (prefers-reduced-motion:reduce){ .btn{transition:none;} }
+</style>
+</head>
+<body>
+
+<!-- TRANSMISSION BAR -->
+<div class="ticker">🚀 LAUNCH OFFER · <b>15% OFF</b> + 3 MONTHS OF THE COMPANION AUDIO SHOW FOR KIDS <a class="tickbtn" href="#buy">GET 15% OFF →</a></div>
+
+<!-- ============ 1. HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">The party game of decoding humans</div>
+      <h1>Being human is a lot. <span class="quiet">Luckily, it's also hilarious.</span></h1>
+      <p class="sub">The party game about the ridiculous, wonderful things every human does — so no kid ever feels like the only one.</p>
+      <a class="btn" href="#buy">Get Totally Human →</a>
+      <div class="microline">Ages 5+ · <s>$[XX]</s> <b>$[XX] launch price</b> · Free shipping over $[XX]</div>
+    </div>
+    <div>
+      <svg class="heroSketch" viewBox="0 0 460 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Art direction sketch for hero photo: child laughing at a table, game box beside them">
+        <!-- photo crop frame -->
+        <rect x="8" y="8" width="444" height="380" rx="14" fill="#FFFFFF" stroke="#2A2153" stroke-width="2.5" stroke-dasharray="7 6"/>
+        <!-- soft backdrop -->
+        <circle cx="230" cy="170" r="150" fill="#EEF1FB"/>
+
+        <!-- table -->
+        <rect x="10" y="288" width="440" height="98" fill="#E7E3F7"/>
+        <line x1="10" y1="288" x2="450" y2="288" stroke="#2A2153" stroke-width="2.5"/>
+
+        <!-- parent arm entering from left edge -->
+        <path d="M10,242 Q60,258 92,292" stroke="#1FB8A3" stroke-width="22" fill="none" stroke-linecap="round"/>
+        <circle cx="97" cy="297" r="12" fill="#2A2153"/>
+
+        <!-- child silhouette: head thrown back, laughing -->
+        <path d="M165,288 C163,240 178,212 210,202 L238,202 C262,210 272,240 272,288 Z" fill="#2A2153"/>
+        <g transform="rotate(-24 218 160)">
+          <circle cx="218" cy="160" r="31" fill="#2A2153"/>
+          <!-- open mouth -->
+          <path d="M218,160 L252,148 A31,31 0 0 1 240,184 Z" fill="#FFFFFF"/>
+        </g>
+        <!-- laugh marks -->
+        <g stroke="#FF6A5A" stroke-width="3" stroke-linecap="round">
+          <line x1="258" y1="122" x2="268" y2="112"/>
+          <line x1="268" y1="140" x2="281" y2="136"/>
+          <line x1="248" y1="108" x2="252" y2="95"/>
+        </g>
+        <text x="285" y="105" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#FF6A5A" transform="rotate(8 285 105)">HA!</text>
+
+        <!-- raised arm holding a card -->
+        <path d="M245,225 Q280,185 305,150" stroke="#2A2153" stroke-width="15" fill="none" stroke-linecap="round"/>
+        <g transform="rotate(14 318 128)">
+          <rect x="300" y="102" width="38" height="52" rx="5" fill="#FFFFFF" stroke="#2A2153" stroke-width="2.5"/>
+          <line x1="306" y1="116" x2="332" y2="116" stroke="#C9C4E3" stroke-width="3"/>
+          <line x1="306" y1="126" x2="332" y2="126" stroke="#C9C4E3" stroke-width="3"/>
+          <line x1="306" y1="136" x2="326" y2="136" stroke="#C9C4E3" stroke-width="3"/>
+        </g>
+
+        <!-- loose cards on the table (mid-game) -->
+        <g fill="#FFFFFF" stroke="#2A2153" stroke-width="2">
+          <rect x="118" y="304" width="44" height="30" rx="4" transform="rotate(-8 140 319)"/>
+          <rect x="185" y="316" width="44" height="30" rx="4" transform="rotate(5 207 331)"/>
+          <rect x="252" y="303" width="44" height="30" rx="4" transform="rotate(-14 274 318)"/>
+        </g>
+        <!-- sync tokens -->
+        <circle cx="320" cy="330" r="8" fill="#FFC63F" stroke="#2A2153" stroke-width="2"/>
+        <circle cx="338" cy="342" r="8" fill="#FFC63F" stroke="#2A2153" stroke-width="2"/>
+
+        <!-- BIG box cutout OVERLAID on the photo, bottom-right corner -->
+        <g transform="rotate(-6 373 277)">
+          <rect x="298" y="172" width="150" height="210" rx="9" fill="#2A2153" stroke="#FFFFFF" stroke-width="6"/>
+          <text x="373" y="216" font-family="Courier New, monospace" font-size="15" fill="#FFC63F" text-anchor="middle">✦ ✦ ✦</text>
+          <text x="373" y="256" font-family="Trebuchet MS, sans-serif" font-size="23" font-weight="bold" fill="#FFFFFF" text-anchor="middle">TOTALLY</text>
+          <text x="373" y="282" font-family="Trebuchet MS, sans-serif" font-size="23" font-weight="bold" fill="#FFFFFF" text-anchor="middle">HUMAN</text>
+          <text x="373" y="306" font-family="Courier New, monospace" font-size="8.5" fill="#B9F0E7" text-anchor="middle">THE PARTY GAME OF DECODING HUMANS</text>
+          <rect x="311" y="324" width="124" height="27" rx="6" fill="#FF6A5A"/>
+          <text x="373" y="342" font-family="Courier New, monospace" font-size="9" font-weight="bold" fill="#FFFFFF" text-anchor="middle">HUMANS ARE… CONFUSING.</text>
+        </g>
+
+        <!-- annotations -->
+        <g font-family="Courier New, monospace" font-size="10.5" fill="#6B6590">
+          <line x1="218" y1="126" x2="130" y2="70" stroke="#6B6590" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="20" y="58">1. HEAD BACK — real mid-game laugh,</text>
+          <text x="20" y="70">   not a smile at the camera</text>
+
+          <line x1="330" y1="128" x2="380" y2="70" stroke="#6B6590" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="330" y="58">2. CARD IN HAND</text>
+          <text x="330" y="70">   (needn't be readable)</text>
+
+          <line x1="330" y1="200" x2="300" y2="374" stroke="#6B6590" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="240" y="374">3. BOX = BIG CUTOUT OVERLAY,</text>
+          <text x="240" y="386">   corner, tilt, white keyline</text>
+
+          <line x1="207" y1="336" x2="180" y2="362" stroke="#6B6590" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="60" y="374">4. LOOSE CARDS + TOKENS =</text>
+          <text x="60" y="386">   game in progress, not staged</text>
+
+          <line x1="50" y1="252" x2="38" y2="215" stroke="#6B6590" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="20" y="205">5. PARENT'S ARM AT</text>
+          <text x="20" y="217">   FRAME EDGE</text>
+        </g>
+
+        <!-- caption -->
+        <text x="230" y="424" font-family="Courier New, monospace" font-size="11" fill="#8A85A8" text-anchor="middle">[ HERO PHOTO — ART DIRECTION SKETCH ]</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST STRIP ============ -->
+<div class="trustbar">
+  ⭐⭐⭐⭐⭐ &nbsp;Big Life Journal products are trusted by over <b>2 million families and professionals</b>
+</div>
+
+<!-- ============ 2. ME-TOO CARD WALL ============ -->
+<section class="metoo">
+  <div class="wrap">
+    <div class="eyebrow">Meet the cards</div>
+    <h2>140 moments your kid thought only happened to them.</h2>
+    <p class="lede">Every Field Note card is a moment every human knows <em>painfully</em> well — collected by Pip &amp; Nova, two curious aliens who study humans and find them completely baffling and completely wonderful.</p>
+    <div class="kidmade">✏️ Pip &amp; Nova were invented by a 9-year-old boy!</div>
+
+    <div class="pairrow">
+      <div class="pair">
+        <div class="fieldnote">
+          <div class="stamp">Field Note #069</div>
+          <p>When a human is told to clean up but really doesn't want to, the move is _________.</p>
+        </div>
+        <div class="rcard"><span class="winbadge">★ WINNER</span>"To pretend to be asleep."</div>
+      </div>
+      <div class="pair">
+        <div class="fieldnote">
+          <div class="stamp">Field Note #101</div>
+          <p>When a human's stomach makes a loud dinosaur noise in a quiet room, the move is _________.</p>
+        </div>
+        <div class="rcard"><span class="winbadge">★ WINNER</span>"To say, 'Well, that happened!'"</div>
+      </div>
+      <div class="pair">
+        <div class="fieldnote">
+          <div class="stamp">Field Note #042</div>
+          <p>When a human waves at the wrong person, the recovery move is _________.</p>
+        </div>
+        <div class="rcard"><span class="winbadge">★ WINNER</span>"To strut off like an offended llama."</div>
+      </div>
+    </div>
+
+    <p class="closer">Read the moment. Play your funniest way through it. Best answer wins.<br>And somewhere mid-laugh, every kid realizes: <em>oh — it's not just me.</em></p>
+    <div class="photonote">[ placeholder — replace styled cards above with flat renders of the real card faces ]</div>
+  </div>
+</section>
+
+<!-- ============ 4. SECRET BENEFITS ============ -->
+<section class="secret">
+  <div class="wrap">
+    <div class="eyebrow">What's underneath</div>
+    <h2>The laughing is real. So is what's underneath it.</h2>
+    <div class="bgrid">
+      <div class="benefit">
+        <h3><span class="bicon">🦖</span>They learn everyone's stomach growls.</h3>
+        <p>Every card is a moment your kid was sure only happened to them. Round after round, "I'm the only one" becomes "wait — you too?"</p>
+      </div>
+      <div class="benefit">
+        <h3><span class="bicon">🃏</span>They practice bouncing back — without noticing.</h3>
+        <p>Every round, kids pick a way out of an awkward moment. Most are pure silliness — but some they'll use for life: <em>"To say, 'I need a moment!'"</em> · <em>"To say a very tiny sorry."</em></p>
+      </div>
+      <div class="benefit">
+        <h3><span class="bicon">🪞</span>They watch YOU laugh at yourself.</h3>
+        <p>When you play a card for "waves at the wrong person" and admit you did it Tuesday, something clicks: grown-ups have these moments too. And survive them.</p>
+      </div>
+      <div class="benefit">
+        <h3><span class="bicon">🔭</span>Embarrassing becomes fascinating.</h3>
+        <p>Cringe moments stop being shameful and start being funny. Forgetting a name isn't a failure — it's just a thing humans do.</p>
+      </div>
+    </div>
+    <div class="center"><a class="btn" href="#buy">Get Totally Human →</a></div>
+  </div>
+</section>
+
+<!-- ============ FULL-BLEED PHOTO BAND ============ -->
+<div class="photoband">
+  <div class="bandnote">[ FULL-WIDTH PHOTO: whole family mid-game, shot from across the table —<br>someone's mid-laugh, cards in the air, motion blur welcome ]</div>
+  <div class="bandquote">"oh — it's not just me."</div>
+</div>
+
+<!-- ============ 5. HOW IT WORKS ============ -->
+<section class="how">
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2>Up and playing in two minutes</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="stepart">
+          <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+            <rect x="38" y="6" width="44" height="58" rx="6" fill="none" stroke="#FFC63F" stroke-width="3" transform="rotate(-6 60 35)"/>
+            <line x1="48" y1="24" x2="76" y2="21" stroke="#FFC63F" stroke-width="3" stroke-linecap="round"/>
+            <line x1="49" y1="34" x2="77" y2="31" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/>
+            <line x1="50" y1="44" x2="70" y2="42" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="num">Step 01 · The moment</div>
+        <h3>Flip a Field Note</h3>
+        <p>An awkward moment everyone at the table has secretly lived. The whole room nods.</p>
+      </div>
+      <div class="step">
+        <div class="stepart">
+          <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+            <rect x="22" y="10" width="34" height="46" rx="5" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" transform="rotate(-10 39 33)"/>
+            <rect x="46" y="8" width="34" height="46" rx="5" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3"/>
+            <rect x="70" y="10" width="34" height="46" rx="5" fill="none" stroke="#1FB8A3" stroke-width="3" transform="rotate(10 87 33)"/>
+            <text x="87" y="40" font-size="16" fill="#1FB8A3" text-anchor="middle" transform="rotate(10 87 33)">★</text>
+          </svg>
+        </div>
+        <div class="num">Step 02 · The comeback</div>
+        <h3>Play your funniest way out</h3>
+        <p>Everyone picks the Response Card that turns the cringe into a punchline.</p>
+      </div>
+      <div class="step">
+        <div class="stepart">
+          <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="38" r="24" fill="none" stroke="#FFC63F" stroke-width="3"/>
+            <circle cx="52" cy="32" r="2.5" fill="#FFC63F"/>
+            <circle cx="68" cy="32" r="2.5" fill="#FFC63F"/>
+            <path d="M48,42 Q60,56 72,42" fill="none" stroke="#FFC63F" stroke-width="3" stroke-linecap="round"/>
+            <g stroke="#FF6A5A" stroke-width="3" stroke-linecap="round">
+              <line x1="90" y1="20" x2="98" y2="12"/>
+              <line x1="94" y1="34" x2="104" y2="32"/>
+              <line x1="26" y1="18" x2="19" y2="11"/>
+            </g>
+          </svg>
+        </div>
+        <div class="num">Step 03 · The laugh</div>
+        <h3>Funniest answer wins</h3>
+        <p>Everyone cracks up. The winner takes the round. Someone yells, "Again!"</p>
+      </div>
+    </div>
+    <div class="modes"><b>Two ways to play:</b> Competitive — the Judge picks the funniest answer, first to 3 Sync Tokens wins. Cooperative — predict what the group will pick and win (or lose) together. One box, two very different game nights.</div>
+  </div>
+</section>
+
+<!-- ============ 6. SOCIAL PROOF ============ -->
+<section class="proof">
+  <div class="wrap">
+    <div class="eyebrow">What families say</div>
+    <h2>The laughing has already started</h2>
+    <div class="gallery">
+      <div class="shot"><span>[ UGC: kid crying-laughing, card in hand — phone-shot, imperfect light ]</span></div>
+      <div class="shot"><span>[ UGC: card held up to camera, "I'M CRYING 😂" energy ]</span></div>
+      <div class="shot"><span>[ UGC: grandparent playing their winning card, table mid-game ]</span></div>
+      <div class="shot"><span>[ UGC: whole family on the living-room floor, cards everywhere ]</span></div>
+      <div class="shot"><span>[ UGC: two siblings arguing over the funniest answer ]</span></div>
+      <div class="shot"><span>[ UGC: classroom rainy-day game, teacher playing too ]</span></div>
+    </div>
+    <div class="quotes">
+      <div class="quote">
+        "My daughter is a perfectionist who cries over small mistakes. She laughed so hard at the toilet-paper card she couldn't breathe. Then she said 'that happened to me' — out loud, smiling."
+        <div class="who">— Parent of a 7-year-old [placeholder]</div>
+      </div>
+      <div class="quote">
+        "The first game my 6-year-old and my 11-year-old both wanted to play again. Immediately. Twice."
+        <div class="who">— Parent of two [placeholder]</div>
+      </div>
+      <div class="quote">
+        "I used it in my counseling group. The kids don't know they're practicing anything. That's exactly why it works."
+        <div class="who">— School counselor [placeholder]</div>
+      </div>
+    </div>
+    <p class="badges">⭐⭐⭐⭐⭐ · From the makers of Big Life Journal, trusted by 2M+ families &amp; professionals · Pip &amp; Nova were invented by a 9-year-old</p>
+  </div>
+</section>
+
+<!-- ============ 6. GIFT & CLASSROOM ============ -->
+<section class="gift">
+  <div class="wrap">
+    <div class="splitgrid">
+      <div class="panel">
+        <div class="eyebrow">For gift-givers</div>
+        <h2>The gift that makes you the favorite aunt</h2>
+        <p>Open the box and the whole party is playing in two minutes — five-year-olds, grandparents, and everyone in between.</p>
+        <div class="gshot"><span>[ PHOTO: birthday party, wrapped box mid-handoff — the kid already reaching for it ]</span></div>
+        <a class="btn" href="#buy">Gift Totally Human →</a>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">For teachers &amp; counselors</div>
+        <h2>Turns a class into a team</h2>
+        <p>Kids laughing at the same card learn something no lesson can teach: everyone trips, everyone blushes, everyone belongs. Perfect for morning meetings, indoor recess, and small groups — and every card is classroom-safe, nothing to pre-screen.</p>
+        <div class="gshot"><span>[ PHOTO: classroom circle — 4–5 kids + teacher playing, teacher laughing hardest ]</span></div>
+        <a class="btn" href="#buy">Get it for your classroom →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6B. THE AUDIO SHOW ============ -->
+<section class="podcast">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">The universe keeps going</div>
+      <h2>The story keeps going after game night</h2>
+      <div class="agechip">🎧 FOR AGES 6–11</div>
+      <p>Pip &amp; Nova have their own weekly audio show: <b>Big Life Universe: Transmissions</b>.</p>
+      <p>And underneath the fun, it has the same heart as the game: kids come away feeling understood, less alone, and pretty proud to be human.</p>
+      <div class="priceline">3 MONTHS INCLUDED WITH YOUR LAUNCH COPY · THEN $5.75/MONTH · CANCEL IN ONE TAP</div>
+      <p class="standalone">You don't need the show to play the game. It's just there if your family wants more.</p>
+    </div>
+    <div>
+      <div class="podcover">
+        <span>[ PODCAST COVER ART<br>square, 1:1 ]</span>
+        <div class="playbadge">▶</div>
+      </div>
+      <div class="ep"><span class="eptitle">▶ EP 01 · Welcome, Earth Agent</span><br>Your family's first mission begins…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6C. THE STATEMENT ============ -->
+<section class="statement">
+  <div class="wrap">
+    <p class="anthem">Humans are ridiculous <span>and</span> resilient — <br>so we made a game that celebrates both.</p>
+    <p class="aicoda">Computers are getting smarter every day. But they'll never trip over nothing, laugh about it, and try again. That's a human thing — and it's exactly what we want our kids to be proud of.</p>
+  </div>
+</section>
+
+<!-- ============ 7. FAQ ============ -->
+<section class="faq">
+  <div class="wrap">
+    <h2>Good questions, honest answers</h2>
+    <details>
+      <summary>Is this actually fun, or is it "educational fun"?</summary>
+      <p>Fair question — you've been burned before. Totally Human was built as a party game first: it got funnier through 100+ playtests before anything else. The good stuff underneath only works <em>because</em> kids are laughing too hard to notice it.</p>
+    </details>
+    <details>
+      <summary>What ages actually work?</summary>
+      <p>The box says 5+. The sweet spot is 7–8, but the cards are written on two levels — kids laugh at the situation, adults laugh at the truth of it. That's the whole trick.</p>
+    </details>
+    <details>
+      <summary>How many players / how long is a game?</summary>
+      <p>[X–X players] · about [XX] minutes — short enough for a school night, repeatable enough that you'll play three rounds anyway.</p>
+    </details>
+    <details>
+      <summary>What's the QR code inside the box?</summary>
+      <p>Scan it and your family receives a free transmission from Pip &amp; Nova — a full episode of <em>Big Life Universe: Transmissions</em>, the podcast where listeners become Earth Agents. The story continues there for families who want more ($5.75/month) — but the game is 100% complete on its own. No subscription needed, ever.</p>
+    </details>
+    <details>
+      <summary>Is the humor… safe?</summary>
+      <p>Yes. No bathroom humor, no mean jokes, nothing that punches down. We laugh <em>with</em> humans, never at them. It's the aliens' rule, and ours.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ============ 8. FINAL CTA ============ -->
+<section class="final" id="buy">
+  <div class="wrap">
+    <h2>Your family is confusing, hilarious, and absolutely worth documenting.</h2>
+    <p>The wrong-person waves. The dinosaur stomachs. The glorious comebacks. Get them all on the table — and laugh at them together.</p>
+    <div class="offercard">
+      <div class="offertitle">🚀 Launch offer</div>
+      <p><b>15% off</b> every copy — plus <b>3 months of the companion audio show for kids</b>, <em>Big Life Universe: Transmissions</em>, where your family becomes Earth Agents ($17 value). $5.75/month after that if you love it — we'll email you before it renews, and you can cancel in one tap.</p>
+    </div>
+    <a class="btn" href="#">Get Totally Human — 15% off →</a>
+    <div class="fineprint">Free shipping over $[XX] · 30-day happiness guarantee · Ships to US, UK, Canada &amp; Australia</div>
+  </div>
+</section>
+
+</body>
+</html>
